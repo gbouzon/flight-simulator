@@ -70,6 +70,12 @@ function createPlanes() {
     });
 }
 
+/**
+ * Checks if the departure city is one of the following alternate departures:
+ * Charlottetown, Edmonton, Fredericton, Halifax, Ottawa, Quebec, Regina, St. John, Toronto, Victoria, Winnipeg
+ * @param {string} departure 
+ * @returns true if the specified departure is one of the alternate departures
+ */
 function isAlternateDeparture(departure) {
     if (alternateDepartures.indexOf(departure) === -1)
         return false;
@@ -91,23 +97,14 @@ $(document).ready(function() {
             //figure this out later
             timer++;
             createPlanes();
-            //if (arrFlights[0] != null) {
-             //   arrFlights[0].draw();
-                //arrFlights[0].move();
-          //  }
                 
-           // ctx.clearRect(0,0, cnv.width, cnv.height);
+            //ctx.clearRect(0,0, cnv.width, cnv.height);
             //ctx.drawImage(backgroudImage, 0, 0, cnv.width, cnv.height);
             //doesn't work ???
             for (var i = 0; i < arrFlights.length; i++) {
                arrFlights[i].draw();
             //    arrFlights[i].move();
-            }
-  
-            
+            } 
         }, 75);
-        
-    });
-
-    
+    });  
 });
