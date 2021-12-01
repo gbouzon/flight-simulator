@@ -1,15 +1,24 @@
 //global variables
+
+//for canvas
 var cnv;
 var ctx;
+//array of flights
 var arrFlights = new Array();
+//nb of steps in which each flight must reach destination
 var nbSteps = 100;
+//background image (map)
 var backgroudImage = new Image();
+backgroudImage.src = "img/Canada-1280-1107.png";
+//timer to keep track of departuretime
 var timer = 0;
+//default image for planes that don't depart from one of the cities in alternateDepartures
 var defaultImage = "img/plane.jpg";
+//to be used for alternateDepartures
 var alternateImage = "";
 var alternateDepartures = ["charlottetown", "edmonton", "fredericton", "halifax", "ottawa", "quebec", "regina", "stjohn", "toronto", "victoria", "winnipeg"];
-backgroudImage.src = "img/Canada-1280-1107.png";
 
+//constructor for plane objects
 function Plane(xCoordinate, yCoordinate, imageSrc, destX, destY) {
     this.step = 0;
     this.xCoordinate = xCoordinate;
@@ -51,7 +60,7 @@ function createPlanes() {
             if (flight.departureTime == timer) {
 
                 if (isAlternateDeparture(flight.departure.toLowerCase().replace(/[\s.]/g, ''))) //removes whitespace and dots
-                    alternateImage = "img/" + flight.departure.toLowerCase().replace(/[\s.]/g, '') + ".jpg";
+                    alternateImage = "img/" + flight.departure.toLowerCase().replace(/[\s.]/g, '') + ".jpg"; //fix extension (some are jpg and some are png)
                 else 
                     alternateImage = defaultImage;
 
