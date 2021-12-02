@@ -19,13 +19,13 @@ var alternateImage = "";
 var alternateDepartures = ["charlottetown", "edmonton", "fredericton", "halifax", "ottawa", "quebec", "regina", "stjohn", "toronto", "victoria", "winnipeg"];
 
 //constructor for plane objects
-function Plane(xCoordinate, yCoordinate, imageSrc, destX, destY) {
+function Plane(xCoordinate, yCoordinate, imageSrc = defaultImage, destX, destY) { //giving default image, test in createPlane()
     this.step = 0;
     this.xCoordinate = xCoordinate;
     this.yCoordinate = yCoordinate;
     this.imageSrc = imageSrc;
-    this.imageWidth = 40;
-    this.imageHeight = 40;
+    this.imageWidth = 20;
+    this.imageHeight = 20;
     this.destX = destX;
     this.destY = destY;
     this.xMove = (this.destX - this.xCoordinate) / nbSteps;
@@ -37,13 +37,18 @@ function Plane(xCoordinate, yCoordinate, imageSrc, destX, destY) {
         ctx.drawImage(planeImage, this.xCoordinate, this.yCoordinate, this.imageWidth, this.imageHeight);
     }
 
+    //problem
     this.move = function() {
-        if (this.step < nbSteps) {
+        //if (this.step < nbSteps) {
             this.step++;
             this.xCoordinate += this.xMove;
             this.yCoordinate += this.yMove;
+            console.log(this.xCoordinate);
+            console.log(this.yCoordinate);
             this.draw();
-        }
+            if (this.step == 100)
+                removePlane(this);
+        //}
     }
 }
 
@@ -58,13 +63,12 @@ function createPlanes() {
         for (var i = 0; i < data.flights.length; i++) {
             var flight = data.flights[i];
             if (flight.departureTime == timer) {
-
                 if (isAlternateDeparture(flight.departure.toLowerCase().replace(/[\s.]/g, ''))) //removes whitespace and dots
                     alternateImage = "img/" + flight.departure.toLowerCase().replace(/[\s.]/g, '') + ".jpg"; //fix extension (some are jpg and some are png)
                 else 
                     alternateImage = defaultImage;
 
-                arrFlights.push(new Plane(flight.departureX, flight.departureY, alternateImage, flight.arrivalX, flight.arrivalY));   
+                arrFlights.push(new Plane(parseInt(flight.departureX), parseInt(flight.departureY), alternateImage, parseInt(flight.arrivalX), parseInt(flight.arrivalY)));   
             }            
         }
     });
@@ -88,22 +92,15 @@ $(document).ready(function() {
     ctx.drawImage(backgroudImage, 0, 0, cnv.width, cnv.height);
 
     $("#mapCanvas").click(function() {
-
-        //var plane = new Plane(645, 245, defaultImage, 336, 417);
-        //arrFlights.push(plane);
-        //plane.draw();
-         
         setInterval(function() {
             //figure this out later
             timer++;
             createPlanes();
-                
-            //ctx.clearRect(0,0, cnv.width, cnv.height);
-            //ctx.drawImage(backgroudImage, 0, 0, cnv.width, cnv.height);
-            //doesn't work ???
-            for (var i = 0; i < arrFlights.length; i++) {
-               arrFlights[i].draw();
-            //    arrFlights[i].move();
+            ctx.clearRect(0,0, cnv.width, cnv.height);
+            ctx.drawImage(backgroudImage, 0, 0, cnv.width, cnv.height);
+            //
+            for (var i = 0; i < arrFlights.length; i++) {               
+                arrFlights[i].move();
             } 
         }, 75);
     });  
