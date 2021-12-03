@@ -55,10 +55,9 @@ function removePlane(item) {
         arrFlights.splice(index, 1);
 }
 
-function getInformation() { //change name
+function getInformation() { 
     $.get("capitals.json", function(data) {
         return data.flights;
-        
     });
 }
 
@@ -66,6 +65,8 @@ function createPlanes(flights) {
     for (var i = 0; i < flights.length; i++) {
         var flight = data.flights[i];
         if (flight.departureTime == timer) {
+            //do switch for this later cause that's what teacher wants
+            //get original extensions back
             if (isAlternateDeparture(flight.departure.toLowerCase().replace(/[\s.]/g, ''))) //removes whitespace and dots
                 alternateImage = "img/" + flight.departure.toLowerCase().replace(/[\s.]/g, '') + ".jpg"; //fix extension (some are jpg and some are png)
             else 
@@ -96,13 +97,19 @@ $(document).ready(function() {
     cnv = document.getElementById("mapCanvas");
     ctx = cnv.getContext("2d");
     ctx.drawImage(backgroudImage, 0, 0, cnv.width, cnv.height);
-    getInformation();
+    flights = getInformation();
+    //getting info from json in document.ready instead of info -> inefficient 
+    //but: "flights" is undefined error
+    //tried not doing a return but setting the value inside getInformation() -> still same error
+    //tried calling it in createPlanes with return statement -> still same error
+    //figure it out later
 
     $("#mapCanvas").click(function() {
         setInterval(function() {
             //figure this out later
+            //apparently this is right? just do a test script pls your ocd can't handle this
             timer++;
-            createPlanes();
+            createPlanes(flights);
             ctx.clearRect(0, 0, cnv.width, cnv.height);
             ctx.drawImage(backgroudImage, 0, 0, cnv.width, cnv.height);
             
