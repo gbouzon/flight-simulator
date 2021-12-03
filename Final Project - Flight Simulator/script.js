@@ -1,32 +1,21 @@
 //global variables
-
-//for canvas
-var cnv;
-var ctx;
-var flights = new Array();
-//array of flights
-var arrFlights = new Array();
-//nb of steps in which each flight must reach destination
-var nbSteps = 100;
-//background image (map)
-var backgroudImage = new Image();
+var cnv; //canvas
+var ctx; //canvas context
+var flights = new Array(); //from json
+var arrFlights = new Array(); //for creating Plane objects
+var nbSteps = 100; //set according to problem statement
+var backgroudImage = new Image(); //map
 backgroudImage.src = "img/Canada-1280-1107.png";
-//timer to keep track of departuretime
-var timer = 0;
-//default image for planes that don't depart from one of the cities in alternateDepartures
-var defaultImage = "img/plane.jpg";
-//to be used for alternateDepartures
-var alternateImage = "";
-var alternateDepartures = ["charlottetown", "edmonton", "fredericton", "halifax", "ottawa", "quebec", "regina", "stjohn", "toronto", "victoria", "winnipeg"];
+var timer = 0; //to keep track of departure time
 
 //constructor for plane objects
-function Plane(xCoordinate, yCoordinate, imageSrc = defaultImage, destX, destY) { //giving default image, test in createPlane()
+function Plane(xCoordinate, yCoordinate, destX, destY, imageSrc = "img/plane.jpg") {
     this.step = 0;
     this.xCoordinate = xCoordinate;
     this.yCoordinate = yCoordinate;
     this.imageSrc = imageSrc;
-    this.imageWidth = 20;
-    this.imageHeight = 20;
+    this.imageWidth = 30;
+    this.imageHeight = 30;
     this.destX = destX;
     this.destY = destY;
     this.xMove = (this.destX - this.xCoordinate) / nbSteps;
@@ -44,70 +33,77 @@ function Plane(xCoordinate, yCoordinate, imageSrc = defaultImage, destX, destY) 
         this.yCoordinate += this.yMove;
         this.draw();
 
-        if (this.step == 100)
+        if (this.step >= 100)
            removePlane(this);
     }
 }
 
+/**
+ * Removes Plane object from array (after making sure it is an element in the actual flight array)
+ * @param {Plane} item 
+ */
 function removePlane(item) {
     var index = arrFlights.indexOf(item);
     if (index !== -1)
         arrFlights.splice(index, 1);
 }
 
+/**
+ * Gets information from json file and stores it into flights array
+ * @return {void}
+ */
 function getInformation() { 
     $.get("capitals.json", function(data) {
-        flights= data.flights;
+        flights = data.flights;
     });
 }
 
-function createPlanes(flights) {
-    for (var i = 0; i < flights.length; i++) {
-        var flight = flights[i];
-        if (flight.departureTime == timer) {
-            //do switch for this later cause that's what teacher wants
-            //get original extensions back
-            if (isAlternateDeparture(flight.departure.toLowerCase().replace(/[\s.]/g, ''))) //removes whitespace and dots
-                alternateImage = "img/" + flight.departure.toLowerCase().replace(/[\s.]/g, '') + ".jpg"; //fix extension (some are jpg and some are png)
-            else 
-                alternateImage = defaultImage;
-
-            arrFlights.push(new Plane(parseInt(flight.departureX), parseInt(flight.departureY), alternateImage, parseInt(flight.arrivalX), parseInt(flight.arrivalY)));   
+/**
+ * Creates Plane objects and adds them to flight array
+ * @param {Plane[]} flights 
+ * @return {void}
+ */
+function createPlanes() {
+    for (var i = 0; i < flights.length; i++) 
+        if (parseInt(flights[i].departureTime) === timer) {
+            var departure = flights[i].departure.toLowerCase().replace(/[\s.-]/g, ''); //removes whitespace and dots
+            arrFlights.push(new Plane(parseInt(flights[i].departureX), 
+                                    parseInt(flights[i].departureY), 
+                                    parseInt(flights[i].arrivalX), 
+                                    parseInt(flights[i].arrivalY),
+                                    setImageFile(departure)));   
         }            
-    }
 }
 
 /**
- * Checks if the departure city is one of the following alternate departures:
- * Charlottetown, Edmonton, Fredericton, Halifax, Ottawa, Quebec, Regina, St. John, Toronto, Victoria, Winnipeg
+ * sets the right image extension depending on location of flight departure
  * @param {string} departure 
- * @returns true if the specified departure is one of the alternate departures
+ * @returns respective image file path
  */
-function isAlternateDeparture(departure) {
-    if (alternateDepartures.indexOf(departure) === -1)
-        return false;
-    return true;
+function setImageFile(departure) {
+    switch(departure) {
+        case "charlottetown": case "edmonton": case "halifax": case "regina": case "stjohn": case "toronto": case "victoria": case "winnipeg":
+            return "img/" + departure + ".jpg";
+        case "fredericton": case "ottawa": case "quebec":
+            return "img/" + departure + ".png"; ; 
+    }
 }
 
 $(document).ready(function() {
     cnv = document.getElementById("mapCanvas");
     ctx = cnv.getContext("2d");
     ctx.drawImage(backgroudImage, 0, 0, cnv.width, cnv.height);
-    getInformation(); //initializes flights array (info from jason)
-    
+    getInformation(); //initializes flights array (info from json)
+
     $("#mapCanvas").click(function() {
         setInterval(function() {
-            //figure this out later
-            //apparently this is right? just do a test script pls your ocd can't handle this
             timer++;
-            createPlanes(flights);
+            createPlanes();
             ctx.clearRect(0, 0, cnv.width, cnv.height);
             ctx.drawImage(backgroudImage, 0, 0, cnv.width, cnv.height);
             
             for (var i = 0; i < arrFlights.length; i++)          
                 arrFlights[i].move();
-
-            console.log(arrFlights.length);
         }, 75);
     });  
 });
