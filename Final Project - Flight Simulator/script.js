@@ -24,7 +24,7 @@ function Plane(xCoordinate, yCoordinate, destX, destY, imageSrc = "img/plane.jpg
     this.draw = function() {
         var planeImage = new Image();
         planeImage.src = this.imageSrc;
-        ctx.drawImage(planeImage, this.xCoordinate, this.yCoordinate, this.imageWidth, this.imageHeight);
+        ctx.drawImage(planeImage, this.xCoordinate - (this.imageWidth / 2), this.yCoordinate - (this.imageHeight / 2), this.imageWidth, this.imageHeight);
     }
 
     this.move = function() {
