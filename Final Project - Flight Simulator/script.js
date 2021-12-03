@@ -11,11 +11,11 @@ var timer = 0; //to keep track of departure time
 //constructor for plane objects
 function Plane(xCoordinate, yCoordinate, destX, destY, imageSrc = "img/plane.jpg") {
     this.step = 0;
+    this.imageWidth = 30;
+    this.imageHeight = 30;
     this.xCoordinate = xCoordinate;
     this.yCoordinate = yCoordinate;
     this.imageSrc = imageSrc;
-    this.imageWidth = 30;
-    this.imageHeight = 30;
     this.destX = destX;
     this.destY = destY;
     this.xMove = (this.destX - this.xCoordinate) / nbSteps;
