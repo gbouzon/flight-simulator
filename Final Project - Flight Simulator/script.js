@@ -3,7 +3,7 @@
 //for canvas
 var cnv;
 var ctx;
-var flights;
+var flights = new Array();
 //array of flights
 var arrFlights = new Array();
 //nb of steps in which each flight must reach destination
@@ -57,13 +57,13 @@ function removePlane(item) {
 
 function getInformation() { 
     $.get("capitals.json", function(data) {
-        return data.flights;
+        flights= data.flights;
     });
 }
 
 function createPlanes(flights) {
     for (var i = 0; i < flights.length; i++) {
-        var flight = data.flights[i];
+        var flight = flights[i];
         if (flight.departureTime == timer) {
             //do switch for this later cause that's what teacher wants
             //get original extensions back
@@ -76,10 +76,6 @@ function createPlanes(flights) {
         }            
     }
 }
-
-/*
-
-*/
 
 /**
  * Checks if the departure city is one of the following alternate departures:
@@ -97,13 +93,8 @@ $(document).ready(function() {
     cnv = document.getElementById("mapCanvas");
     ctx = cnv.getContext("2d");
     ctx.drawImage(backgroudImage, 0, 0, cnv.width, cnv.height);
-    flights = getInformation();
-    //getting info from json in document.ready instead of info -> inefficient 
-    //but: "flights" is undefined error
-    //tried not doing a return but setting the value inside getInformation() -> still same error
-    //tried calling it in createPlanes with return statement -> still same error
-    //figure it out later
-
+    getInformation(); //initializes flights array (info from jason)
+    
     $("#mapCanvas").click(function() {
         setInterval(function() {
             //figure this out later
