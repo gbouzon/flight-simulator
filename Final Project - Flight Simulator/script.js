@@ -3,6 +3,7 @@
 //for canvas
 var cnv;
 var ctx;
+var flights;
 //array of flights
 var arrFlights = new Array();
 //nb of steps in which each flight must reach destination
@@ -37,18 +38,14 @@ function Plane(xCoordinate, yCoordinate, imageSrc = defaultImage, destX, destY) 
         ctx.drawImage(planeImage, this.xCoordinate, this.yCoordinate, this.imageWidth, this.imageHeight);
     }
 
-    //problem
     this.move = function() {
-        //if (this.step < nbSteps) {
-            this.step++;
-            this.xCoordinate += this.xMove;
-            this.yCoordinate += this.yMove;
-            console.log(this.xCoordinate);
-            console.log(this.yCoordinate);
-            this.draw();
-            if (this.step == 100)
-                removePlane(this);
-        //}
+        this.step++;
+        this.xCoordinate += this.xMove;
+        this.yCoordinate += this.yMove;
+        this.draw();
+
+        if (this.step == 100)
+           removePlane(this);
     }
 }
 
@@ -58,21 +55,30 @@ function removePlane(item) {
         arrFlights.splice(index, 1);
 }
 
-function createPlanes() {
+function getInformation() { //change name
     $.get("capitals.json", function(data) {
-        for (var i = 0; i < data.flights.length; i++) {
-            var flight = data.flights[i];
-            if (flight.departureTime == timer) {
-                if (isAlternateDeparture(flight.departure.toLowerCase().replace(/[\s.]/g, ''))) //removes whitespace and dots
-                    alternateImage = "img/" + flight.departure.toLowerCase().replace(/[\s.]/g, '') + ".jpg"; //fix extension (some are jpg and some are png)
-                else 
-                    alternateImage = defaultImage;
-
-                arrFlights.push(new Plane(parseInt(flight.departureX), parseInt(flight.departureY), alternateImage, parseInt(flight.arrivalX), parseInt(flight.arrivalY)));   
-            }            
-        }
+        return data.flights;
+        
     });
 }
+
+function createPlanes(flights) {
+    for (var i = 0; i < flights.length; i++) {
+        var flight = data.flights[i];
+        if (flight.departureTime == timer) {
+            if (isAlternateDeparture(flight.departure.toLowerCase().replace(/[\s.]/g, ''))) //removes whitespace and dots
+                alternateImage = "img/" + flight.departure.toLowerCase().replace(/[\s.]/g, '') + ".jpg"; //fix extension (some are jpg and some are png)
+            else 
+                alternateImage = defaultImage;
+
+            arrFlights.push(new Plane(parseInt(flight.departureX), parseInt(flight.departureY), alternateImage, parseInt(flight.arrivalX), parseInt(flight.arrivalY)));   
+        }            
+    }
+}
+
+/*
+
+*/
 
 /**
  * Checks if the departure city is one of the following alternate departures:
@@ -90,18 +96,20 @@ $(document).ready(function() {
     cnv = document.getElementById("mapCanvas");
     ctx = cnv.getContext("2d");
     ctx.drawImage(backgroudImage, 0, 0, cnv.width, cnv.height);
+    getInformation();
 
     $("#mapCanvas").click(function() {
         setInterval(function() {
             //figure this out later
             timer++;
             createPlanes();
-            ctx.clearRect(0,0, cnv.width, cnv.height);
+            ctx.clearRect(0, 0, cnv.width, cnv.height);
             ctx.drawImage(backgroudImage, 0, 0, cnv.width, cnv.height);
-            //
-            for (var i = 0; i < arrFlights.length; i++) {               
+            
+            for (var i = 0; i < arrFlights.length; i++)          
                 arrFlights[i].move();
-            } 
+
+            console.log(arrFlights.length);
         }, 75);
     });  
 });
